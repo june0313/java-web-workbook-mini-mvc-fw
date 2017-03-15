@@ -1,13 +1,17 @@
 package spms.servlets;
 
+import spms.controls.*;
 import spms.vo.Member;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -23,43 +27,58 @@ public class DispatcherServlet extends HttpServlet {
 		String servletPath = request.getServletPath();
 
 		try {
-			String pageControllerPath;
+			ServletContext sc = this.getServletContext();
+			Map<String, Object> model = new HashMap<>();
+			model.put("memberDao", sc.getAttribute("memberDao"));
+			model.put("session", request.getSession());
+
+			Controller pageController = null;
+
 			switch (servletPath) {
 				case "/member/list.do":
-					pageControllerPath = "/member/list";
+					pageController = new MemberListController();
 					break;
 				case "/member/add.do":
-					pageControllerPath = "/member/add";
+					pageController = new MemberAddController();
 					Optional.ofNullable(request.getParameter("email")).ifPresent(email ->
-						request.setAttribute("member", new Member()
+						model.put("member", new Member()
 							.setEmail(email)
 							.setName(request.getParameter("name"))
 							.setPassword(request.getParameter("password"))));
 					break;
 				case "/member/update.do":
-					pageControllerPath = "/member/update";
+					pageController = new MemberUpdateController();
+
+					Optional.ofNullable(request.getParameter("no")).ifPresent(no -> model.put("no", no));
+
 					Optional.ofNullable(request.getParameter("email")).ifPresent(email ->
-						request.setAttribute("member", new Member()
+						model.put("member", new Member()
 							.setNo(Integer.parseInt(request.getParameter("no")))
 							.setEmail(email)
 							.setName(request.getParameter("name"))));
 					break;
 				case "/member/delete.do":
-					pageControllerPath = "/member/delete";
+					pageController = new MemberDeleteController();
+					Optional.ofNullable(request.getParameter("no")).ifPresent(no -> model.put("no", no));
 					break;
 				case "/auth/login.do":
-					pageControllerPath = "/auth/login";
+					pageController = new LoginController();
+					Optional.ofNullable(request.getParameter("email")).ifPresent(email -> model.put("email", email));
+					Optional.ofNullable(request.getParameter("password")).ifPresent(password -> model.put("password", password));
 					break;
 				case "/auth/logout.do":
-					pageControllerPath = "/auth/logout";
+					pageController = new LogOutController();
 					break;
 				default:
-					pageControllerPath = "/";
+					pageController = new MemberListController();
 			}
 
-			request.getRequestDispatcher(pageControllerPath).include(request, response);
+			String viewUrl = pageController.execute(model);
 
-			String viewUrl = (String) request.getAttribute("viewUrl");
+			for (String key : model.keySet()) {
+				request.setAttribute(key, model.get(key));
+			}
+
 			if (viewUrl.startsWith("redirect:")) {
 				response.sendRedirect(viewUrl.substring(9));
 				return;
