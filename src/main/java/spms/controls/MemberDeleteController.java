@@ -10,11 +10,17 @@ import java.util.Map;
  */
 public class MemberDeleteController implements Controller {
 
+	private MemberDao memberDao;
+
+	public MemberDeleteController setMemberDao(MemberDao memberDao) {
+		this.memberDao = memberDao;
+		return this;
+	}
+
 	@Override
 	public String execute(Map<String, Object> model) throws Exception {
 		Integer no = Integer.parseInt((String) model.get("no"));
 
-		MemberDao memberDao = (MemberDao) model.get("memberDao");
 		memberDao.delete(no);
 
 		return "redirect:list.do";

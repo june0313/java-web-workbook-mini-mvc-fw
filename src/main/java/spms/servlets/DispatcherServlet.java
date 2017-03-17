@@ -29,17 +29,12 @@ public class DispatcherServlet extends HttpServlet {
 		try {
 			ServletContext sc = this.getServletContext();
 			Map<String, Object> model = new HashMap<>();
-			model.put("memberDao", sc.getAttribute("memberDao"));
 			model.put("session", request.getSession());
 
-			Controller pageController = null;
+			Controller pageController = (Controller) sc.getAttribute(servletPath);
 
 			switch (servletPath) {
-				case "/member/list.do":
-					pageController = new MemberListController();
-					break;
 				case "/member/add.do":
-					pageController = new MemberAddController();
 					Optional.ofNullable(request.getParameter("email")).ifPresent(email ->
 						model.put("member", new Member()
 							.setEmail(email)
@@ -47,8 +42,6 @@ public class DispatcherServlet extends HttpServlet {
 							.setPassword(request.getParameter("password"))));
 					break;
 				case "/member/update.do":
-					pageController = new MemberUpdateController();
-
 					Optional.ofNullable(request.getParameter("no")).ifPresent(no -> model.put("no", no));
 
 					Optional.ofNullable(request.getParameter("email")).ifPresent(email ->
@@ -58,19 +51,12 @@ public class DispatcherServlet extends HttpServlet {
 							.setName(request.getParameter("name"))));
 					break;
 				case "/member/delete.do":
-					pageController = new MemberDeleteController();
 					Optional.ofNullable(request.getParameter("no")).ifPresent(no -> model.put("no", no));
 					break;
 				case "/auth/login.do":
-					pageController = new LoginController();
 					Optional.ofNullable(request.getParameter("email")).ifPresent(email -> model.put("email", email));
 					Optional.ofNullable(request.getParameter("password")).ifPresent(password -> model.put("password", password));
 					break;
-				case "/auth/logout.do":
-					pageController = new LogOutController();
-					break;
-				default:
-					pageController = new MemberListController();
 			}
 
 			String viewUrl = pageController.execute(model);

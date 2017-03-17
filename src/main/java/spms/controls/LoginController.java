@@ -12,6 +12,13 @@ import java.util.Map;
  */
 public class LoginController implements Controller{
 
+	private MemberDao memberDao;
+
+	public LoginController setMemberDao(MemberDao memberDao) {
+		this.memberDao = memberDao;
+		return this;
+	}
+
 	@Override
 	public String execute(Map<String, Object> model) throws Exception {
 		HttpSession session = (HttpSession) model.get("session");
@@ -23,7 +30,6 @@ public class LoginController implements Controller{
 			return "/auth/LogInForm.jsp";
 		}
 
-		MemberDao memberDao = (MemberDao) model.get("memberDao");
 		Member member = memberDao.exist(email, password);
 
 		if (member != null) {
