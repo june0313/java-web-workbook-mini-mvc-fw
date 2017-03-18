@@ -1,5 +1,6 @@
 package spms.controls;
 
+import spms.bind.DataBinding;
 import spms.dao.MemberDao;
 import spms.vo.Member;
 
@@ -10,7 +11,7 @@ import java.util.Map;
  * Created by wayne on 2017. 3. 15..
  *
  */
-public class LoginController implements Controller{
+public class LoginController implements Controller, DataBinding {
 
 	private MemberDao memberDao;
 
@@ -22,9 +23,10 @@ public class LoginController implements Controller{
 	@Override
 	public String execute(Map<String, Object> model) throws Exception {
 		HttpSession session = (HttpSession) model.get("session");
+		Member loginInfo = (Member) model.get("loginInfo");
 
-		String email = (String) model.get("email");
-		String password = (String) model.get("password");
+		String email = loginInfo.getEmail();
+		String password = loginInfo.getPassword();
 
 		if (email == null && password == null) {
 			return "/auth/LogInForm.jsp";
@@ -40,4 +42,10 @@ public class LoginController implements Controller{
 		return "redirect:/auth/LogInFail.jsp";
 	}
 
+	@Override
+	public Object[] getDataBinders() {
+		return new Object[] {
+			"loginInfo", Member.class
+		};
+	}
 }

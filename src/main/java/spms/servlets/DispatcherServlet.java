@@ -1,6 +1,8 @@
 package spms.servlets;
 
-import spms.controls.*;
+import spms.bind.DataBinding;
+import spms.bind.ServletRequestDataBinder;
+import spms.controls.Controller;
 import spms.vo.Member;
 
 import javax.servlet.ServletContext;
@@ -33,30 +35,8 @@ public class DispatcherServlet extends HttpServlet {
 
 			Controller pageController = (Controller) sc.getAttribute(servletPath);
 
-			switch (servletPath) {
-				case "/member/add.do":
-					Optional.ofNullable(request.getParameter("email")).ifPresent(email ->
-						model.put("member", new Member()
-							.setEmail(email)
-							.setName(request.getParameter("name"))
-							.setPassword(request.getParameter("password"))));
-					break;
-				case "/member/update.do":
-					Optional.ofNullable(request.getParameter("no")).ifPresent(no -> model.put("no", no));
-
-					Optional.ofNullable(request.getParameter("email")).ifPresent(email ->
-						model.put("member", new Member()
-							.setNo(Integer.parseInt(request.getParameter("no")))
-							.setEmail(email)
-							.setName(request.getParameter("name"))));
-					break;
-				case "/member/delete.do":
-					Optional.ofNullable(request.getParameter("no")).ifPresent(no -> model.put("no", no));
-					break;
-				case "/auth/login.do":
-					Optional.ofNullable(request.getParameter("email")).ifPresent(email -> model.put("email", email));
-					Optional.ofNullable(request.getParameter("password")).ifPresent(password -> model.put("password", password));
-					break;
+			if (pageController instanceof DataBinding) {
+				prepareRequestData(request, model, (DataBinding) pageController);
 			}
 
 			String viewUrl = pageController.execute(model);
@@ -76,6 +56,22 @@ public class DispatcherServlet extends HttpServlet {
 			request.setAttribute("error", e);
 			request.getRequestDispatcher("/Error.jsp").forward(request, response);
 		}
+	}
+
+	private void prepareRequestData(HttpServletRequest request, Map<String, Object> model, DataBinding dataBinding) throws Exception {
+		Object[] dataBinders = dataBinding.getDataBinders();
+
+		String dataName;
+		Class<?> dataType;
+		Object dataObj;
+
+		for (int i = 0; i < dataBinders.length; i += 2) {
+			dataName = (String) dataBinders[i];
+			dataType = (Class<?>) dataBinders[i + 1];
+			dataObj = ServletRequestDataBinder.bind(request, dataType, dataName);
+			model.put(dataName, dataObj);
+		}
+
 	}
 
 }
