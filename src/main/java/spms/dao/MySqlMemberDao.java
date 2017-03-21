@@ -2,6 +2,7 @@ package spms.dao;
 
 // DataSource 활용 
 
+import spms.annotation.Component;
 import spms.vo.Member;
 
 import javax.sql.DataSource;
@@ -12,6 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component("memberDao")
 public class MySqlMemberDao implements MemberDao {
 	DataSource ds;
 

@@ -1,5 +1,7 @@
 package spms.controls;
 
+import spms.annotation.Component;
+
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
@@ -7,6 +9,7 @@ import java.util.Map;
  * Created by wayne on 2017. 3. 15..
  *
  */
+@Component("/auth/logout.do")
 public class LogOutController implements Controller {
 
 	@Override

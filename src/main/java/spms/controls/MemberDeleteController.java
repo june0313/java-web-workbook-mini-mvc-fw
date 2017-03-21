@@ -1,5 +1,6 @@
 package spms.controls;
 
+import spms.annotation.Component;
 import spms.bind.DataBinding;
 import spms.dao.MemberDao;
 
@@ -9,6 +10,7 @@ import java.util.Map;
  * Created by wayne on 2017. 3. 15..
  *
  */
+@Component("/member/delete.do")
 public class MemberDeleteController implements Controller, DataBinding {
 
 	private MemberDao memberDao;

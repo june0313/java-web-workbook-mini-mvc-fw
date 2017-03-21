@@ -1,11 +1,15 @@
 package spms.context;
 
+import org.reflections.Reflections;
+import spms.annotation.Component;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.io.FileReader;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Created by wayne on 2017. 3. 21..
@@ -22,7 +26,18 @@ public class ApplicationContext {
 		props.load(new FileReader(propertiesPath));
 
 		prepareObjects(props);
+		prepareAnnotationObjects();
 		injectDependency();
+	}
+
+	private void prepareAnnotationObjects() throws Exception {
+		Reflections reflector = new Reflections("");
+
+		Set<Class<?>> list = reflector.getTypesAnnotatedWith(Component.class);
+		for (Class<?> clazz : list) {
+			String key = clazz.getAnnotation(Component.class).value();
+			objTable.put(key, clazz.newInstance());
+		}
 	}
 
 	private void prepareObjects(Properties props) throws Exception {
