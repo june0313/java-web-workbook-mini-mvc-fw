@@ -1,5 +1,6 @@
 package spms.controls;
 
+import spms.annotation.Component;
 import spms.bind.DataBinding;
 import spms.dao.MemberDao;
 import spms.vo.Member;
@@ -10,6 +11,7 @@ import java.util.Map;
  * Created by wayne on 2017. 3. 15..
  *
  */
+@Component("/member/update.do")
 public class MemberUpdateController implements Controller, DataBinding {
 
 	private MemberDao memberDao;
