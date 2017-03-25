@@ -57,4 +57,32 @@ public class MySqlProjectDao implements ProjectDao {
 		}
 	}
 
+	@Override
+	public int insert(Project project) throws Exception {
+		Connection connection = null;
+		PreparedStatement statement = null;
+
+		try {
+			connection = dataSource.getConnection();
+			String sql = "INSERT INTO PROJECTS (PNAME, CONTENT, STA_DATE, END_DATE, TAGS, CRE_DATE, STATE) VALUES (?, ?, ?, ?, ?, NOW(), 0)";
+			statement = connection.prepareStatement(sql);
+			statement.setString(1, project.getTitle());
+			statement.setString(2, project.getContent());
+			statement.setDate(3, project.getStartDate());
+			statement.setDate(4, project.getEndDate());
+			statement.setString(5, project.getTags());
+			return statement.executeUpdate();
+
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (statement != null) {
+				statement.close();
+			}
+			if (connection != null) {
+				connection.close();
+			}
+		}
+	}
+
 }
