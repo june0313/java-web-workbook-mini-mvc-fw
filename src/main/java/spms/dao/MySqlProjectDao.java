@@ -85,4 +85,73 @@ public class MySqlProjectDao implements ProjectDao {
 		}
 	}
 
+	@Override
+	public Project selectOne(int no) throws Exception {
+		Connection connection = null;
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+
+		try {
+			connection = dataSource.getConnection();
+			statement = connection.prepareStatement("SELECT * FROM PROJECTS WHERE PNO = ?");
+			statement.setInt(1, no);
+			resultSet = statement.executeQuery();
+
+			if (resultSet.next()) {
+				return new Project()
+					.setNo(resultSet.getInt("PNO"))
+					.setTitle(resultSet.getString("PNAME"))
+					.setContent(resultSet.getString("CONTENT"))
+					.setStartDate(resultSet.getDate("STA_DATE"))
+					.setEndDate(resultSet.getDate("END_DATE"))
+					.setState(resultSet.getInt("STATE"))
+					.setCreatedDate(resultSet.getDate("CRE_DATE"))
+					.setTags(resultSet.getString("TAGS"));
+			} else {
+				throw new Exception("해당 번호의 프로젝트를 찾을 수 없습니다.");
+			}
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (resultSet != null) {
+				resultSet.close();
+			}
+			if (statement != null) {
+				statement.close();
+			}
+			if (connection != null) {
+				connection.close();
+			}
+		}
+	}
+
+	@Override
+	public int update(Project project) throws Exception {
+		Connection connection = null;
+		PreparedStatement statement = null;
+
+		try {
+			connection = dataSource.getConnection();
+			statement = connection.prepareStatement("UPDATE PROJECTS SET PNAME=?, CONTENT=?, STA_DATE=?, END_DATE=?, STATE=?, TAGS=? WHERE PNO = ?");
+			statement.setString(1, project.getTitle());
+			statement.setString(2, project.getContent());
+			statement.setDate(3, project.getStartDate());
+			statement.setDate(4, project.getEndDate());
+			statement.setInt(5, project.getState());
+			statement.setString(6, project.getTags());
+			statement.setInt(7, project.getNo());
+
+			return statement.executeUpdate();
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (statement != null) {
+				statement.close();
+			}
+			if (connection != null) {
+				connection.close();
+			}
+		}
+	}
+
 }
