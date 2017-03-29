@@ -42,8 +42,6 @@ public class MySqlProjectDao implements ProjectDao {
 
 			return projects;
 
-		} catch (SQLException e) {
-			throw e;
 		} finally {
 			if (resultSet != null) {
 				resultSet.close();
@@ -73,8 +71,6 @@ public class MySqlProjectDao implements ProjectDao {
 			statement.setString(5, project.getTags());
 			return statement.executeUpdate();
 
-		} catch (SQLException e) {
-			throw e;
 		} finally {
 			if (statement != null) {
 				statement.close();
@@ -110,8 +106,6 @@ public class MySqlProjectDao implements ProjectDao {
 			} else {
 				throw new Exception("해당 번호의 프로젝트를 찾을 수 없습니다.");
 			}
-		} catch (SQLException e) {
-			throw e;
 		} finally {
 			if (resultSet != null) {
 				resultSet.close();
@@ -142,8 +136,27 @@ public class MySqlProjectDao implements ProjectDao {
 			statement.setInt(7, project.getNo());
 
 			return statement.executeUpdate();
-		} catch (SQLException e) {
-			throw e;
+		} finally {
+			if (statement != null) {
+				statement.close();
+			}
+			if (connection != null) {
+				connection.close();
+			}
+		}
+	}
+
+	@Override
+	public int delete(int no) throws Exception {
+		Connection connection = null;
+		PreparedStatement statement = null;
+
+		try {
+			connection = dataSource.getConnection();
+			statement = connection.prepareStatement("DELETE FROM PROJECTS WHERE PNO=?");
+			statement.setInt(1, no);
+
+			return statement.executeUpdate();
 		} finally {
 			if (statement != null) {
 				statement.close();

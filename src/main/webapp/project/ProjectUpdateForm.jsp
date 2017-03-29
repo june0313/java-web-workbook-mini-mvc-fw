@@ -67,8 +67,8 @@
     </ul>
 
     <input type="submit" value="저장"/>
-    <input type="submit" value="삭제" onclick="location.href='delete.do?no=${project.no}"/>
-    <input type="reset" value="취소" onclick="location.href='list.do'"/>
+    <input type="button" value="삭제" onclick="location.href='delete.do?no=${project.no}'"/>
+    <input type="button" value="취소" onclick="location.href='list.do'"/>
 </form>
 <jsp:include page="../Tail.jsp"/>
 </body>
